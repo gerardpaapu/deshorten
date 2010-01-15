@@ -54,7 +54,7 @@
   (let* ([url      (request-uri req)]
          [query    (url-query url)]
          [shorts   (dict-ref query 'short)]
-         [callback (dict-reg query 'callback)])
+         [callback (dict-ref query 'callback)])
     (js-response
      (if (and shorts callback)
          (let ([data (deshorten* (regexp-split #rx"," shorts))])
