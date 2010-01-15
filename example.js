@@ -32,5 +32,5 @@ function deshorten(links) {
 }
 
 window.addEvent('domready', function () {
-    deshorten($$('a[href^=http://]'));
+    deshorten($$('a[href^=http://bit.ly]'));
 });
