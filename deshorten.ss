@@ -9,15 +9,10 @@
   (let ([code (http-client-response-code response)])
     (<= 300 code 306)))
 
-(define (get-prop k l)
-  (let ([result (assoc k l)])
-    (and result (cdr result))))
-
-
 (define (deshorten url)
   (let ([resp (http-get url)])
     (if (redirect? resp)
-        (get-prop "Location" (http-client-response-headers resp))
+        (dict-ref (http-client-response-headers resp) "Location")
         url)))
 
 (define *cache* (make-hash))
@@ -58,8 +53,8 @@
 (define (start req)
   (let* ([url      (request-uri req)]
          [query    (url-query url)]
-         [shorts   (get-prop 'short query)]
-         [callback (get-prop 'callback query)])
+         [shorts   (dict-ref query 'short)]
+         [callback (dict-reg query 'callback)])
     (js-response
      (if (and shorts callback)
          (let ([data (deshorten* (regexp-split #rx"," shorts))])
