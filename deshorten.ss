@@ -56,9 +56,10 @@
          [shorts   (dict-ref query 'short #f)]
          [callback (dict-ref query 'callback #f)])
     (js-response
-     (if (and shorts callback)
+     (if shorts 
          (let ([data (deshorten* (regexp-split #rx"," shorts))])
-           (string-append callback "(" (jsexpr->json data) ")"))
+           (string-append (or callback "") 
+                          "(" (jsexpr->json data) ")"))
          "/* the format is http://hostname/?short=foo,...&callback=callback */"))))
 
 (define (serve-deshortener)
