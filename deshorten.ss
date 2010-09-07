@@ -12,7 +12,7 @@
 (define (deshorten url)
   (let ([resp (http-get url)])
     (if (redirect? resp)
-        (dict-ref (http-client-response-headers resp) "Location")
+        (dict-ref (http-client-response-headers resp) "Location" "")
         url)))
 
 (define *cache* (make-hash))
@@ -58,12 +58,13 @@
 (define (start req)
   (let* ([url      (request-uri req)]
          [query    (url-query url)]
-         [shorts   (dict-ref query 'short)]
-         [callback (dict-ref query 'callback)])
+         [shorts   (dict-ref query 'short #f)]
+         [callback (dict-ref query 'callback #f)])
     (js-response
-     (if (and shorts callback)
+     (if shorts 
          (let ([data (deshorten* (regexp-split #rx"," shorts))])
-           (string-append callback "(" (jsexpr->json data) ")"))
+           (string-append (or callback "") 
+                          "(" (jsexpr->json data) ")"))
          "/* the format is http://hostname/?short=foo,...&callback=callback */"))))
 
 (define (serve-deshortener)
