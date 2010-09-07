@@ -3,34 +3,29 @@
  * it uses MooTools 1.2.4 and some elements of MooTools More
  */
 function deshorten(links) {
-    var urls  = links.map(getHref),
-        table = $H(links.associate(urls)),
-        req   = new Request.JSONP({
-            url: 'http://thecyberplains.com:8000/',
-            data: {'short': urls.join(',')},
-            onComplete: callBack
-        });
+    var links = $$(links),
+        urls  = links.get('href'),
+        table = $H(links.associate(urls));
 
-    req.send();
-    
-    function callBack (json) {
-        $H(json).each(
-            function(longUrl, shortUrl){
+    new Request.JSONP({
+        url: 'http://gerardpaapu.com/deshorten',
+        data: {'short': urls.join(',')},
+        onComplete: function (json){
+            $H(json).each(function(longUrl, shortUrl){
                 var oldLink = table.get(shortUrl),
                     newLink = new Element('a', {
                         'href': longUrl,
                         'text': longUrl
                     });
 
-                newLink.replaces(oldLink);
+                if (oldLink) newLink.replaces(oldLink);
             });
-    }
+        }
+    }).send();
 
-    function getHref(o) {
-        return o.get('href');
-    }
+    
 }
 
 window.addEvent('domready', function () {
-    deshorten($$('a[href^=http://bit.ly]'));
+    deshorten('a[href^=http://bit.ly]');
 });
