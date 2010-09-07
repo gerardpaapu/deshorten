@@ -37,13 +37,18 @@
           long))
   (make-immutable-hash (map fn results)))
 
-(define (deshorten* urls)
+(define (p/map fn ls)
   (let* ([parent (current-thread)]
-         [child  (lambda (url)
+         [child  (lambda (item)
                    (thread (lambda ()
-                             (thread-send parent `(,url ,(deshorten/caching url))))))])
+                             (thread-send parent (fn item)))))])
     (for-each sync (map child urls))
-    (results->hash (thread-receive-all))))
+    (thread-receive-all)))
+
+(define (deshorten* urls)
+  (results->hash (p/map (lambda (url)
+                          (cons url (deshorten/caching url)))
+                        urls)))
 
 (define (js-response str)
   (make-response/full 200 #"OK" (current-seconds)
