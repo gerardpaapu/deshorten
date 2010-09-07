@@ -25,10 +25,10 @@
         long)))
 
 (define (thread-receive-all)
-  (let ([msg (thread-try-receive)])
-    (if msg
-        (cons msg (thread-receive-all))
-        '())))
+  (cond [(thread-try-receive) =>
+         (lambda (msg)
+           (cons msg (thread-receive-all)))]
+        [else '()]))
 
 (define (results->hash results)
   (define (fn ls)
